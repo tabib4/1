@@ -41,6 +41,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 0.65rem;
+      position: relative;
     }
 
     .brand {
@@ -57,9 +58,10 @@
       color: #ffffff;
     }
 
-    .header-search {
+    .header-actions {
       display: flex;
       align-items: center;
+      gap: 0.5rem;
     }
 
     input[type="text"], input[type="url"] {
@@ -83,6 +85,74 @@
 
     input:focus {
       border-color: var(--accent);
+    }
+
+    .gear-btn {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .gear-btn:hover, .gear-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .settings-drawer {
+      display: none;
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.25rem;
+      animation: slideDown 0.15s ease-out;
+    }
+
+    .settings-drawer.open {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .drawer-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .drawer-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .drawer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
     }
 
     .btn {
@@ -129,7 +199,7 @@
       display: grid;
       grid-template-columns: 1fr 440px;
       gap: 1rem;
-      padding: 0.85rem 1rem;
+      padding: 0.85rem 1rem 1.25rem;
       flex: 1;
       max-width: 1600px;
       width: 100%;
@@ -139,13 +209,14 @@
     @media (max-width: 960px) {
       .main-layout {
         grid-template-columns: 1fr;
-        padding: 0.75rem;
+        padding: 0.75rem 0.75rem 1rem;
         gap: 0.75rem;
       }
-      .header-search {
+      .header-actions {
         width: 100%;
       }
       input[type="text"] {
+        flex: 1;
         width: 100%;
       }
       .sidebar {
@@ -273,7 +344,7 @@
       padding: 0.45rem 0.75rem;
       border-bottom: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
     }
 
@@ -344,36 +415,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
-    footer.playlist-footer {
-      background-color: var(--bg-secondary);
-      border-top: 1px solid var(--border);
-      padding: 1rem 1.25rem;
-      margin-top: 0.5rem;
-    }
-
-    .footer-inner {
-      max-width: 1600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-
-    .footer-label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .footer-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-    }
   </style>
 </head>
 <body>
@@ -383,10 +424,29 @@
       <span>IPTV -</span>
       <span class="brand-name">AJMAIN ABRAR TABIB</span>
     </div>
-    <div class="header-search">
+    <div class="header-actions">
       <input type="text" id="searchInput" placeholder="Search channels..." />
+      <button class="gear-btn" id="settingsToggleBtn" title="Playlist & Proxy Settings" aria-label="Playlist & Proxy Settings">⚙</button>
     </div>
   </header>
+
+  <div class="settings-drawer" id="settingsDrawer">
+    <div class="drawer-inner">
+      <span class="drawer-label">Playlist & Proxy Settings</span>
+      <div class="drawer-controls">
+        <input type="url" id="m3uUrlInput" placeholder="Enter custom M3U Playlist URL..." />
+        <button class="btn" id="loadPlaylistBtn">Load URL</button>
+        <label class="btn btn-secondary" style="cursor:pointer;">
+          Upload .M3U
+          <input type="file" id="fileInput" accept=".m3u,.m3u8" style="display:none;" />
+        </label>
+        <label class="toggle-label" title="Routes HTTP streams (and failed HTTPS streams) through Vercel /api/proxy">
+          <input type="checkbox" id="proxyToggle" checked />
+          Auto-Proxy HTTP
+        </label>
+      </div>
+    </div>
+  </div>
 
   <main class="main-layout">
     <section class="player-section">
@@ -407,37 +467,15 @@
     </section>
 
     <aside class="sidebar">
-      <div class="category-tabs" id="categoryTabs">
-        <button class="tab-btn active" data-category="All">All</button>
-      </div>
+      <div class="category-tabs" id="categoryTabs"></div>
 
       <div class="channel-count">
-        <span id="playlistStatus">Loading playlist...</span>
         <span id="visibleCount">0 channels</span>
       </div>
 
       <div class="channel-list" id="channelList"></div>
-
     </aside>
   </main>
-
-  <footer class="playlist-footer">
-    <div class="footer-inner">
-      <span class="footer-label">Playlist & Proxy Settings</span>
-      <div class="footer-controls">
-        <input type="url" id="m3uUrlInput" placeholder="Enter custom M3U Playlist URL..." />
-        <button class="btn" id="loadPlaylistBtn">Load URL</button>
-        <label class="btn btn-secondary" style="cursor:pointer;">
-          Upload .M3U
-          <input type="file" id="fileInput" accept=".m3u,.m3u8" style="display:none;" />
-        </label>
-        <label class="toggle-label" title="Routes HTTP streams (and failed HTTPS streams) through Vercel /api/proxy">
-          <input type="checkbox" id="proxyToggle" checked />
-          Auto-Proxy HTTP
-        </label>
-      </div>
-    </div>
-  </footer>
 
   <script>
     const DEFAULT_M3U_URL = "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/IPTV-Playlist.m3u";
@@ -464,6 +502,8 @@
     const video = document.getElementById("videoPlayer");
     const channelListEl = document.getElementById("channelList");
     const searchInput = document.getElementById("searchInput");
+    const settingsToggleBtn = document.getElementById("settingsToggleBtn");
+    const settingsDrawer = document.getElementById("settingsDrawer");
     const m3uUrlInput = document.getElementById("m3uUrlInput");
     const loadPlaylistBtn = document.getElementById("loadPlaylistBtn");
     const fileInput = document.getElementById("fileInput");
@@ -474,14 +514,18 @@
     const currentTitle = document.getElementById("currentTitle");
     const currentCategory = document.getElementById("currentCategory");
     const streamStatus = document.getElementById("streamStatus");
-    const playlistStatus = document.getElementById("playlistStatus");
     const visibleCount = document.getElementById("visibleCount");
 
     let channels = [];
-    let activeCategory = "All";
+    let activeCategory = "Bangladesh";
     let searchQuery = "";
     let activeChannelUrl = null;
     let hls = null;
+
+    settingsToggleBtn.addEventListener("click", () => {
+      const isOpen = settingsDrawer.classList.toggle("open");
+      settingsToggleBtn.classList.toggle("active", isOpen);
+    });
 
     function setStatus(text, isError = false) {
       streamStatus.textContent = text;
@@ -521,11 +565,28 @@
     }
 
     function buildCategoryTabs() {
-      const groups = ["All", ...new Set(channels.map(ch => ch.group))];
-      if (!groups.includes(activeCategory)) activeCategory = "All";
+      const rawGroups = [...new Set(channels.map(ch => ch.group))];
+      const priorityOrder = ["bangladesh", "india", "kids"];
+      const prioritized = [];
+
+      priorityOrder.forEach(target => {
+        const found = rawGroups.find(g => g.toLowerCase() === target);
+        if (found) prioritized.push(found);
+      });
+
+      const remaining = rawGroups.filter(
+        g => !priorityOrder.includes(g.toLowerCase())
+      );
+
+      const orderedTabs = [...prioritized, "All", ...remaining];
+
+      if (!orderedTabs.includes(activeCategory)) {
+        activeCategory = prioritized.length > 0 ? prioritized[0] : "All";
+      }
+
       categoryTabs.innerHTML = "";
 
-      groups.forEach(group => {
+      orderedTabs.forEach(group => {
         const btn = document.createElement("button");
         btn.className = "tab-btn" + (group === activeCategory ? " active" : "");
         btn.dataset.category = group;
@@ -535,7 +596,6 @@
     }
 
     async function loadM3UPlaylist(url) {
-      playlistStatus.textContent = "Fetching playlist...";
       channelListEl.innerHTML = "";
 
       try {
@@ -546,16 +606,14 @@
         if (parsed.length === 0) throw new Error("No channels found in M3U");
 
         channels = parsed;
-        activeCategory = "All";
+        activeCategory = "Bangladesh";
         buildCategoryTabs();
         renderChannels();
-        playlistStatus.textContent = "GitHub M3U Loaded";
       } catch (err) {
         channels = BUILTIN_CHANNELS;
-        activeCategory = "All";
+        activeCategory = "Bangladesh";
         buildCategoryTabs();
         renderChannels();
-        playlistStatus.textContent = "Using Built-in List";
       }
     }
 
@@ -671,7 +729,11 @@
 
     loadPlaylistBtn.addEventListener("click", () => {
       const url = m3uUrlInput.value.trim();
-      if (url) loadM3UPlaylist(url);
+      if (url) {
+        loadM3UPlaylist(url);
+        settingsDrawer.classList.remove("open");
+        settingsToggleBtn.classList.remove("active");
+      }
     });
 
     fileInput.addEventListener("change", (e) => {
@@ -682,10 +744,11 @@
         const parsed = parseM3U(ev.target.result);
         if (parsed.length > 0) {
           channels = parsed;
-          activeCategory = "All";
+          activeCategory = "Bangladesh";
           buildCategoryTabs();
           renderChannels();
-          playlistStatus.textContent = "Loaded: " + file.name;
+          settingsDrawer.classList.remove("open");
+          settingsToggleBtn.classList.remove("active");
         }
       };
       reader.readAsText(file);
