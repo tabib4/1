@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPTV - AJMAIN ABRAR TABIB</title>
+  <!-- Hls.js v0.14.17: 100% compatible with 2019 LG webOS 4.5 (Chromium 53) AND iPhone 15 Safari -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@0.14.17/dist/hls.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: #070b14;
+      color: #f8fafc;
+      overflow: hidden;
+    }
+
+    body {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    }
+
+    header {
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 12px 20px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+      position: relative;
+      z-index: 30;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+      height: 58px;
+    }
+
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+
+    .brand-name {
+      color: #ffffff;
+    }
+
+    .header-actions {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+
+    .settings-toggle-btn {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .settings-toggle-btn:hover,
+    .settings-toggle-btn:focus,
+    .settings-toggle-btn.active {
+      background: #38bdf8;
+      color: #070b14;
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    .settings-drawer {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      margin-top: 8px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+      width: 480px;
+      max-width: calc(100vw - 40px);
+      z-index: 40;
+    }
+
+    .settings-drawer.open {
+      display: block;
+    }
+
+    .drawer-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .playlist-controls {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+
+    .playlist-controls > * {
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"], input[type="url"] {
+      background: #070b14;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus, input[type="url"]:focus {
+      border-color: #38bdf8;
+    }
+
+    button, .file-label {
+      background: #38bdf8;
+      color: #070b14;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    button:hover, button:focus, .file-label:hover {
+      background: #7dd3fc;
+      outline: none;
+    }
+
+    button.secondary, .file-label {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+    }
+
+    button.secondary:hover, button.secondary:focus, .file-label:hover {
+      background: #334155;
+    }
+
+    .proxy-toggle {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      background: #1e293b;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      cursor: pointer;
+    }
+
+    .proxy-toggle input {
+      margin-right: 6px;
+    }
+
+    .main-container {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex: 1;
+      flex: 1;
+      height: calc(100vh - 58px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .player-section {
+      -webkit-flex: 1;
+      flex: 1;
+      background: #000000;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-justify-content: center;
+      justify-content: center;
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    video {
+      width: 100%;
+      height: calc(100% - 62px);
+      background: #000000;
+      object-fit: contain;
+      display: block;
+    }
+
+    video.zoom-fill {
+      object-fit: cover;
+    }
+
+    .now-playing-bar {
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      padding: 10px 20px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+      height: 62px;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .channel-meta {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .channel-meta img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 3px;
+      margin-right: 12px;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .now-playing-title {
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .now-playing-sub {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .player-controls-right {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .player-controls-right > * + * {
+      margin-left: 8px;
+    }
+
+    .status-badge {
+      font-size: 0.76rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #1e293b;
+      color: #38bdf8;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-badge.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    .status-badge.ok {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+    }
+
+    .status-badge.warn {
+      background: rgba(250, 204, 21, 0.2);
+      color: #facc15;
+    }
+
+    .sidebar {
+      width: 430px;
+      height: 100%;
+      min-height: 0;
+      background: #0f172a;
+      border-left: 1px solid #1e293b;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .search-box input {
+      width: 100%;
+    }
+
+    .category-tabs {
+      display: -webkit-flex;
+      display: flex;
+      overflow-x: auto;
+      padding: 8px 14px;
+      border-bottom: 1px solid #1e293b;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .category-tabs::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .category-tabs::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    .tab {
+      background: #1e293b;
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      white-space: nowrap;
+      border: 1px solid transparent;
+      margin-right: 6px;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .tab.active {
+      background: #38bdf8;
+      color: #070b14;
+      font-weight: 700;
+    }
+
+    .tab:focus {
+      border-color: #ffffff;
+      outline: none;
+    }
+
+    .channel-count {
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      color: #64748b;
+      border-bottom: 1px solid #1e293b;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .channel-list {
+      -webkit-flex: 1;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 10px 12px 24px;
+      font-size: 0;
+    }
+
+    .channel-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .channel-list::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    .channel-card {
+      width: 48.5%;
+      width: calc(50% - 4px);
+      margin-bottom: 8px;
+      display: -webkit-inline-flex;
+      display: inline-flex;
+      vertical-align: top;
+      -webkit-align-items: center;
+      align-items: center;
+      padding: 8px 9px;
+      border-radius: 9px;
+      cursor: pointer;
+      border: 1px solid #1e293b;
+      background: #111827;
+      min-width: 0;
+      font-size: 14px;
+    }
+
+    .channel-card:nth-child(odd) {
+      margin-right: 8px;
+    }
+
+    .channel-card:hover,
+    .channel-card:focus {
+      background: #1e293b;
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    .channel-card.active {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: #38bdf8;
+    }
+
+    .channel-card img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #070b14;
+      padding: 2px;
+      margin-right: 8px;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+    }
+
+    .channel-info {
+      overflow: hidden;
+      min-width: 0;
+      -webkit-flex: 1;
+      flex: 1;
+    }
+
+    .channel-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .channel-group {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .load-more-btn {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .main-container {
+        -webkit-flex-direction: column;
+        flex-direction: column;
+      }
+      .player-section {
+        -webkit-flex: none;
+        flex: none;
+        height: 44vh;
+      }
+      video {
+        height: calc(100% - 62px);
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        -webkit-flex: 1;
+        flex: 1;
+        border-left: none;
+        border-top: 1px solid #1e293b;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span>IPTV -</span>
+      <span class="brand-name">AJMAIN ABRAR TABIB</span>
+    </div>
+    <div class="header-actions">
+      <button class="settings-toggle-btn" id="settingsToggleBtn" title="Playlist &amp; Stream Settings">⚙</button>
+    </div>
+
+    <div class="settings-drawer" id="settingsDrawer">
+      <div class="drawer-title">Playlist &amp; Stream Settings</div>
+      <div class="playlist-controls">
+        <input type="url" id="m3uUrlInput" placeholder="Enter M3U Playlist URL..." style="flex:1; min-width:200px;" />
+        <button id="loadUrlBtn">Load URL</button>
+        <label class="file-label">
+          Upload .M3U
+          <input type="file" id="fileInput" accept=".m3u,.m3u8" style="display:none;" />
+        </label>
+        <label class="proxy-toggle" title="Route HTTP streams through HTTPS proxy">
+          <input type="checkbox" id="proxyToggle" checked />
+          Auto-Proxy HTTP
+        </label>
+        <button class="secondary" id="resetDefaultBtn">Reset Default</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <section class="player-section">
+      <video id="videoPlayer" controls playsinline webkit-playsinline autoplay></video>
+      <div class="now-playing-bar">
+        <div class="channel-meta" id="nowPlayingBox">
+          <img id="currentLogo" src="https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/btv-national-2db28e10.png" alt="Logo" />
+          <div style="min-width:0;">
+            <div class="now-playing-title" id="currentTitle">Loading Channels...</div>
+            <div class="now-playing-sub" id="currentCategory">Bangladesh</div>
+          </div>
+        </div>
+        <div class="player-controls-right">
+          <button class="secondary" id="prevChBtn" title="Previous Channel">◀ Prev</button>
+          <button class="secondary" id="nextChBtn" title="Next Channel">Next ▶</button>
+          <button class="secondary" id="aspectBtn" title="Toggle Fit / Fill">Fit</button>
+          <span class="status-badge" id="qualityBadge">ABR: Auto</span>
+          <span class="status-badge" id="streamStatus">Idle</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search channels..." />
+      </div>
+      <div class="category-tabs" id="categoryTabs"></div>
+      <div class="channel-count">
+        <span>CH ▲/▼ • 0-9 Zap</span>
+        <span id="channelCount">0 channels</span>
+      </div>
+      <div class="channel-list" id="channelList"></div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var DEFAULT_M3U_URL = "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/IPTV-Playlist.m3u";
+      var FALLBACK_LOGO = "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/btv-national-2db28e10.png";
+      var STORAGE_LAST_URL = "iptv_first_last_ch_v1";
+      var STORAGE_CUSTOM_M3U = "iptv_first_custom_m3u_v1";
+      var BATCH_SIZE = 40;
+
+      var BUILTIN_CHANNELS = [
+        { name: "ATN Bangla", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/atn-bangla.png", url: "https://tvsen5.aynaott.com/atnbangla/index.m3u8" },
+        { name: "Bangla Vision", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/banglavision.png", url: "https://tvsen5.aynaott.com/banglavision/index.m3u8" },
+        { name: "BTV National", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/btv-national-2db28e10.png", url: "https://nkafmbewiff.gpcdn.net/tile_2/master.m3u8" },
+        { name: "Channel 24", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/channel-24.png", url: "https://tvsen6.aynaott.com/YrVDF8gujkdh/index.m3u8" },
+        { name: "Channel I", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/channel-i.png", url: "https://tvsen6.aynaott.com/FNHpYvGZ7FkCE10PwTHm/index.m3u8" },
+        { name: "Deepto TV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/deepto-tv.png", url: "https://byphdgllyk.gpcdn.net/hls/deeptotv/index.m3u8" },
+        { name: "Ekattor TV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/ekattor-tv.png", url: "https://tvsen6.aynaott.com/EWDrV5QskgarZEUBb3pU/index.m3u8" },
+        { name: "Jamuna TV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/jamuna-tv.png", url: "https://tvsen6.aynaott.com/KGdZEdA7qQ43dmPkgk1j/index.m3u8" },
+        { name: "Maasranga TV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/maasranga-tv.png", url: "https://mtv.sunplex.live/MAASRANGA/index.m3u8" },
+        { name: "NTV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/ntv.png", url: "https://tvsen5.aynaott.com/xV4jEKf3D9zc/index.m3u8" },
+        { name: "RTV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/rtv.png", url: "https://tvsen5.aynaott.com/RtvHD/index.m3u8" },
+        { name: "Somoy TV", group: "Bangladesh", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/somoy-tv.png", url: "https://tvsen6.aynaott.com/4XcqdovJzbbC9WdJA9gk/index.m3u8" },
+        { name: "A Sports", group: "Sports", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/a-sports-65a3e1d8fd.png", url: "https://playztv-apps.pages.dev/a-sports/index.m3u8" },
+        { name: "Star Sports 1 Hindi", group: "Sports", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/star-sports-1-hindi.png", url: "https://starsportshindiii.pages.dev/index.m3u8" },
+        { name: "Duronto TV", group: "Kids", logo: "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/duronto-tv-2b3c7dd202.png", url: "https://tvsen5.aynaott.com/6xyZ3N4oHv2KBJdB6W4p/index.fmp4.m3u8" }
+      ];
+
+      var video = document.getElementById("videoPlayer");
+      var channelListEl = document.getElementById("channelList");
+      var categoryTabs = document.getElementById("categoryTabs");
+      var searchInput = document.getElementById("searchInput");
+      var channelCount = document.getElementById("channelCount");
+      var currentLogo = document.getElementById("currentLogo");
+      var currentTitle = document.getElementById("currentTitle");
+      var currentCategory = document.getElementById("currentCategory");
+      var streamStatus = document.getElementById("streamStatus");
+      var qualityBadge = document.getElementById("qualityBadge");
+      var m3uUrlInput = document.getElementById("m3uUrlInput");
+      var loadUrlBtn = document.getElementById("loadUrlBtn");
+      var resetDefaultBtn = document.getElementById("resetDefaultBtn");
+      var fileInput = document.getElementById("fileInput");
+      var proxyToggle = document.getElementById("proxyToggle");
+      var settingsToggleBtn = document.getElementById("settingsToggleBtn");
+      var settingsDrawer = document.getElementById("settingsDrawer");
+      var prevChBtn = document.getElementById("prevChBtn");
+      var nextChBtn = document.getElementById("nextChBtn");
+      var aspectBtn = document.getElementById("aspectBtn");
+
+      var channels = [];
+      var filteredChannels = [];
+      var renderedCount = 0;
+      var activeCategory = "Bangladesh";
+      var searchQuery = "";
+      var activeChannelUrl = null;
+      var activeChannelObj = null;
+      var hls = null;
+
+      var stallWatchdogTimer = null;
+      var lastPlaybackTime = 0;
+      var stallCount = 0;
+      var totalStallsThisChannel = 0;
+      var isZoomFill = false;
+      var zapDigits = "";
+      var zapTimer = null;
+      var isNativeHlsMode = false;
+
+      // Detect 2019 LG webOS TV (Chromium 53) vs modern iPhone/Desktop
+      var ua = navigator.userAgent || "";
+      var isLegacyTv = ua.indexOf("Web0S") !== -1 || ua.indexOf("webOS") !== -1 || ua.indexOf("Chrome/53") !== -1 || ua.indexOf("SmartTV") !== -1;
+
+      function hasClass(el, cls) {
+        return (" " + el.className + " ").indexOf(" " + cls + " ") !== -1;
+      }
+
+      function addClass(el, cls) {
+        if (!hasClass(el, cls)) {
+          el.className = (el.className ? el.className + " " : "") + cls;
+        }
+      }
+
+      function removeClass(el, cls) {
+        el.className = (" " + el.className + " ").replace(" " + cls + " ", " ").replace(/^\s+|\s+$/g, "");
+      }
+
+      function setStatus(text, type) {
+        streamStatus.textContent = text;
+        streamStatus.className = "status-badge" + (type ? " " + type : "");
+      }
+
+      function updateQualityBadge(text, isDegraded) {
+        qualityBadge.textContent = text;
+        qualityBadge.className = isDegraded ? "status-badge warn" : "status-badge";
+      }
+
+      settingsToggleBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (hasClass(settingsDrawer, "open")) {
+          removeClass(settingsDrawer, "open");
+          removeClass(settingsToggleBtn, "active");
+        } else {
+          addClass(settingsDrawer, "open");
+          addClass(settingsToggleBtn, "active");
+        }
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!settingsDrawer.contains(e.target) && e.target !== settingsToggleBtn) {
+          removeClass(settingsDrawer, "open");
+          removeClass(settingsToggleBtn, "active");
+        }
+      });
+
+      aspectBtn.addEventListener("click", function () {
+        isZoomFill = !isZoomFill;
+        if (isZoomFill) {
+          addClass(video, "zoom-fill");
+          aspectBtn.textContent = "Fill";
+        } else {
+          removeClass(video, "zoom-fill");
+          aspectBtn.textContent = "Fit";
+        }
+      });
+
+      function parseM3U(m3uText) {
+        var lines = m3uText.split(/\r?\n/);
+        var parsed = [];
+        var currentInfo = null;
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i].replace(/^\s+|\s+$/g, "");
+          if (!line) continue;
+
+          if (line.indexOf("#EXTINF:") === 0) {
+            var logoMatch = line.match(/tvg-logo="([^"]*)"/i);
+            var groupMatch = line.match(/group-title="([^"]*)"/i);
+            var commaIdx = line.lastIndexOf(",");
+            var name = commaIdx !== -1 ? line.substring(commaIdx + 1).replace(/^\s+|\s+$/g, "") : "Channel";
+
+            currentInfo = {
+              name: name || "Channel",
+              logo: (logoMatch && logoMatch[1]) ? logoMatch[1] : FALLBACK_LOGO,
+              group: (groupMatch && groupMatch[1]) ? groupMatch[1] : "Others"
+            };
+          } else if (line.charAt(0) !== "#" && currentInfo) {
+            parsed.push({
+              num: parsed.length + 1,
+              name: currentInfo.name,
+              logo: currentInfo.logo,
+              group: currentInfo.group,
+              url: line
+            });
+            currentInfo = null;
+          }
+        }
+        return parsed;
+      }
+
+      function buildCategoryTabs() {
+        var rawGroups = [];
+        for (var i = 0; i < channels.length; i++) {
+          if (rawGroups.indexOf(channels[i].group) === -1) {
+            rawGroups.push(channels[i].group);
+          }
+        }
+
+        var priorityOrder = ["bangladesh", "india", "kids"];
+        var prioritized = [];
+
+        for (var p = 0; p < priorityOrder.length; p++) {
+          for (var g = 0; g < rawGroups.length; g++) {
+            if (rawGroups[g].toLowerCase() === priorityOrder[p]) {
+              prioritized.push(rawGroups[g]);
+              break;
+            }
+          }
+        }
+
+        var remaining = [];
+        for (var r = 0; r < rawGroups.length; r++) {
+          if (priorityOrder.indexOf(rawGroups[r].toLowerCase()) === -1) {
+            remaining.push(rawGroups[r]);
+          }
+        }
+
+        var orderedTabs = prioritized.concat(["All"], remaining);
+
+        if (orderedTabs.indexOf(activeCategory) === -1) {
+          activeCategory = prioritized.length > 0 ? prioritized[0] : "All";
+        }
+
+        categoryTabs.innerHTML = "";
+        for (var t = 0; t < orderedTabs.length; t++) {
+          var groupName = orderedTabs[t];
+          var tab = document.createElement("div");
+          tab.className = "tab" + (groupName === activeCategory ? " active" : "");
+          tab.setAttribute("tabindex", "0");
+          tab.setAttribute("data-category", groupName);
+          tab.textContent = groupName;
+          categoryTabs.appendChild(tab);
+        }
+      }
+
+      function getPlayableUrl(rawUrl, forceProxy) {
+        var isHttpsSite = window.location.protocol === "https:";
+        var isHttpStream = rawUrl.indexOf("http://") === 0;
+        if ((isHttpsSite && isHttpStream && proxyToggle.checked) || forceProxy) {
+          return "/api/proxy?url=" + encodeURIComponent(rawUrl);
+        }
+        return rawUrl;
+      }
+
+      function teardownPlayer() {
+        clearInterval(stallWatchdogTimer);
+        if (hls) {
+          try { hls.destroy(); } catch (e) {}
+          hls = null;
+        }
+        video.onloadedmetadata = null;
+        video.onerror = null;
+        video.onstalled = null;
+        try {
+          video.pause();
+          video.removeAttribute("src");
+          video.load();
+        } catch (e) {}
+      }
+
+      /* Smart TV Anti-Buffer & Quality Lock Engine:
+         Why it buffered before: Hls.js automatically climbed up to 1080p high-bitrate
+         on the 2019 LG TV, overflowing its slow Wi-Fi / Chromium 53 decoder.
+         Solution: On Legacy TV, lock permanently to the lowest/480p stream once
+         a stall happens (never climb back up to 1080p) and use TV hardware HLS first! */
+      function enforceTvSafeQuality() {
+        if (!hls || !hls.levels || hls.levels.length === 0) return;
+
+        // Sort level indices by bitrate ascending
+        var sorted = [];
+        for (var i = 0; i < hls.levels.length; i++) {
+          sorted.push({ idx: i, bitrate: hls.levels[i].bitrate || 0, height: hls.levels[i].height || 0 });
+        }
+        sorted.sort(function (a, b) { return a.bitrate - b.bitrate; });
+
+        if (isLegacyTv) {
+          // On 2019 LG TV: pick the lightest SD/480p level (<= 480p or lowest bitrate) and LOCK it
+          var tvTarget = sorted[0];
+          for (var j = 0; j < sorted.length; j++) {
+            if (sorted[j].height > 0 && sorted[j].height <= 480) {
+              tvTarget = sorted[j];
+            }
+          }
+          hls.startLevel = tvTarget.idx;
+          hls.currentLevel = tvTarget.idx;
+          hls.autoLevelCapping = tvTarget.idx;
+          var labelH = tvTarget.height ? tvTarget.height + "p" : "SD";
+          updateQualityBadge("TV Lock • " + labelH, false);
+        } else {
+          // Phones & modern desktops keep full Auto ABR
+          hls.autoLevelCapping = -1;
+          updateQualityBadge("ABR: Auto", false);
+        }
+      }
+
+      function startStallWatchdog(streamUrl, channel) {
+        clearInterval(stallWatchdogTimer);
+        lastPlaybackTime = video.currentTime || 0;
+        stallCount = 0;
+
+        stallWatchdogTimer = setInterval(function () {
+          if (video.paused || video.ended || !activeChannelObj) return;
+
+          var nowTime = video.currentTime;
+          var bufferedAhead = 0;
+          if (video.buffered && video.buffered.length > 0) {
+            bufferedAhead = video.buffered.end(video.buffered.length - 1) - nowTime;
+          }
+
+          if (Math.abs(nowTime - lastPlaybackTime) < 0.2) {
+            stallCount++;
+            totalStallsThisChannel++;
+
+            if (hls && hls.levels && hls.levels.length > 0) {
+              // Drop immediately to absolute lowest bitrate level (index 0) and LOCK it permanently for this session
+              var lowestIdx = 0;
+              var minBitrate = hls.levels[0].bitrate || 999999999;
+              for (var k = 1; k < hls.levels.length; k++) {
+                if ((hls.levels[k].bitrate || 0) < minBitrate) {
+                  minBitrate = hls.levels[k].bitrate;
+                  lowestIdx = k;
+                }
+              }
+              hls.currentLevel = lowestIdx;
+              hls.autoLevelCapping = lowestIdx;
+              var lowH = hls.levels[lowestIdx].height;
+              updateQualityBadge("TV Eco • " + (lowH ? lowH + "p" : "Low"), true);
+              setStatus("Locking Smooth Quality...", "warn");
+            } else {
+              setStatus("Buffering (" + Math.max(0, bufferedAhead).toFixed(1) + "s)...", "warn");
+            }
+
+            // Skip past stream timestamp gaps automatically
+            if (video.buffered && video.buffered.length > 0) {
+              var bufEnd = video.buffered.end(video.buffered.length - 1);
+              if (bufEnd - nowTime > 0.35) {
+                video.currentTime = bufEnd - 0.1;
+              }
+            }
+
+            // If JS MSE still stalls on 2019 LG TV, switch to TV's native hardware HLS decoder
+            if (stallCount >= 3 && !isNativeHlsMode && video.canPlayType("application/vnd.apple.mpegurl")) {
+              isNativeHlsMode = true;
+              setStatus("Switching to TV HW Chip...", "warn");
+              startNativeHardwarePlayback(streamUrl, channel);
+              return;
+            }
+          } else {
+            stallCount = 0;
+            setStatus(isNativeHlsMode ? "Live (TV Hardware)" : (streamUrl.indexOf("/api/proxy") === 0 ? "Live (Proxied)" : "Live"), "ok");
+          }
+          lastPlaybackTime = nowTime;
+        }, 2000);
+      }
+
+      function safeVideoPlay() {
+        try {
+          var playPromise = video.play();
+          if (playPromise && typeof playPromise.catch === "function") {
+            playPromise.catch(function () {
+              video.muted = true;
+              try {
+                var mutedPromise = video.play();
+                if (mutedPromise && typeof mutedPromise.then === "function") {
+                  mutedPromise.then(function () {
+                    setStatus("Playing (Muted)", "warn");
+                  }).catch(function () {
+                    setStatus("Tap Video to Play", "warn");
+                  });
+                }
+              } catch (e2) {
+                setStatus("Tap Video to Play", "warn");
+              }
+            });
+          }
+        } catch (err) {
+          setStatus("Tap Video to Play", "warn");
+        }
+      }
+
+      /* Hardware-accelerated native <video> HLS playback */
+      function startNativeHardwarePlayback(streamUrl, channel) {
+        teardownPlayer();
+        updateQualityBadge("TV HW • Smooth", false);
+        video.preload = "auto";
+        video.src = streamUrl;
+
+        video.onloadedmetadata = function () {
+          setStatus("Live (TV Hardware)", "ok");
+          safeVideoPlay();
+          startStallWatchdog(streamUrl, channel);
+        };
+
+        video.onerror = function () {
+          if (streamUrl.indexOf("/api/proxy") !== 0 && proxyToggle.checked) {
+            startNativeHardwarePlayback(getPlayableUrl(channel.url, true), channel);
+          } else {
+            setStatus("Stream Offline", "error");
+          }
+        };
+
+        safeVideoPlay();
+        startStallWatchdog(streamUrl, channel);
+      }
+
+      function startPlayback(streamUrl, channel, isRetry) {
+        teardownPlayer();
+        isNativeHlsMode = false;
+        totalStallsThisChannel = 0;
+        updateQualityBadge(isLegacyTv ? "TV Lock • 480p" : "ABR: Auto", false);
+
+        // On iPhone Safari, always use Apple's native hardware HLS engine
+        if (!isLegacyTv && typeof Hls === "undefined" && video.canPlayType("application/vnd.apple.mpegurl")) {
+          isNativeHlsMode = true;
+          startNativeHardwarePlayback(streamUrl, channel);
+          return;
+        }
+
+        if (typeof Hls !== "undefined" && Hls.isSupported()) {
+          hls = new Hls({
+            enableWorker: false,
+            startLevel: 0, // Always start on lowest bitrate for instant 0-buffer start
+            autoStartLoad: true,
+            capLevelToPlayerSize: true,
+            abrEwmaDefaultEstimate: isLegacyTv ? 180000 : 500000, // Tell Hls.js TV connection is low-bandwidth so it never jumps to 1080p
+            abrBandWidthFactor: isLegacyTv ? 0.5 : 0.75,
+            abrBandWidthUpFactor: isLegacyTv ? 0.2 : 0.5,
+            maxBufferLength: isLegacyTv ? 30 : 30, // Deep 30-second buffer cushion
+            maxMaxBufferLength: 60,
+            maxBufferSize: isLegacyTv ? 20 * 1000 * 1000 : 35 * 1000 * 1000,
+            maxBufferHole: 0.8,
+            maxFragLookUpTolerance: 0.4,
+            liveSyncDurationCount: isLegacyTv ? 5 : 4, // 5 segments behind live edge absorbs Wi-Fi drops completely
+            liveMaxLatencyDurationCount: 15,
+            fragLoadingTimeOut: 15000,
+            fragLoadingMaxRetry: 8,
+            fragLoadingRetryDelay: 600,
+            manifestLoadingTimeOut: 12000,
+            manifestLoadingMaxRetry: 5,
+            levelLoadingTimeOut: 12000,
+            levelLoadingMaxRetry: 5
+          });
+
+          hls.loadSource(streamUrl);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            // Immediately lock 2019 LG TV to <= 480p (SD/Smooth) so it NEVER climbs into heavy 1080p HD!
+            enforceTvSafeQuality();
+            setStatus(streamUrl.indexOf("/api/proxy") === 0 ? "Live (Proxied)" : "Live", "ok");
+            safeVideoPlay();
+            startStallWatchdog(streamUrl, channel);
+          });
+
+          hls.on(Hls.Events.LEVEL_SWITCHED, function (event, data) {
+            if (!hls || !hls.levels || !hls.levels[data.level]) return;
+            var h = hls.levels[data.level].height;
+            // If 2019 LG TV ever tries to switch above 480p, force it back down immediately
+            if (isLegacyTv && h && h > 480 && hls.levels.length > 1) {
+              enforceTvSafeQuality();
+              return;
+            }
+            if (h) {
+              updateQualityBadge((isLegacyTv ? "TV Smooth • " : "Auto • ") + h + "p", totalStallsThisChannel > 0);
+            }
+          });
+
+          hls.on(Hls.Events.ERROR, function (event, data) {
+            if (!data.fatal) {
+              if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || data.details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT || data.details === Hls.ErrorDetails.BUFFER_APPEND_ERROR) {
+                if (hls) {
+                  hls.currentLevel = 0;
+                  hls.autoLevelCapping = 0;
+                  updateQualityBadge("TV Eco • 0 Buffer", true);
+                }
+                setStatus("Refilling Buffer...", "warn");
+              }
+              return;
+            }
+
+            if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+              setStatus("Recovering...", "warn");
+              hls.recoverMediaError();
+              return;
+            }
+
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              if (!isRetry && streamUrl.indexOf("/api/proxy") !== 0 && proxyToggle.checked) {
+                setStatus("Switching to Proxy...", "warn");
+                startPlayback(getPlayableUrl(channel.url, true), channel, true);
+                return;
+              }
+              setStatus("Reconnecting...", "warn");
+              setTimeout(function () {
+                if (hls && activeChannelUrl === channel.url) {
+                  hls.startLoad();
+                }
+              }, 1200);
+              return;
+            }
+
+            // Automatic failover to native TV hardware HLS decoder if MSE fails
+            if (video.canPlayType("application/vnd.apple.mpegurl")) {
+              isNativeHlsMode = true;
+              startNativeHardwarePlayback(streamUrl, channel);
+              return;
+            }
+
+            setStatus("Stream Offline / Geo-Blocked", "error");
+          });
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          isNativeHlsMode = true;
+          startNativeHardwarePlayback(streamUrl, channel);
+        } else {
+          setStatus("HLS Unsupported", "error");
+        }
+      }
+
+      function updateActiveCardHighlight() {
+        var cards = channelListEl.querySelectorAll(".channel-card");
+        for (var i = 0; i < cards.length; i++) {
+          var cardUrl = cards[i].getAttribute("data-url");
+          if (cardUrl === activeChannelUrl) {
+            addClass(cards[i], "active");
+          } else {
+            removeClass(cards[i], "active");
+          }
+        }
+      }
+
+      function playChannel(channel) {
+        if (!channel) return;
+        activeChannelUrl = channel.url;
+        activeChannelObj = channel;
+
+        try {
+          localStorage.setItem(STORAGE_LAST_URL, channel.url);
+        } catch (e) {}
+
+        currentLogo.src = channel.logo;
+        currentLogo.onerror = function () { currentLogo.src = FALLBACK_LOGO; };
+        currentTitle.textContent = "#" + channel.num + "  " + channel.name;
+        currentCategory.textContent = channel.group;
+
+        updateActiveCardHighlight();
+
+        if (window.location.protocol === "https:" && channel.url.indexOf("http://") === 0 && !proxyToggle.checked) {
+          setStatus("Enable Auto-Proxy", "error");
+          return;
+        }
+
+        var streamUrl = getPlayableUrl(channel.url, false);
+        setStatus(streamUrl.indexOf("/api/proxy") === 0 ? "Connecting (Proxy)..." : "Connecting...", "warn");
+        startPlayback(streamUrl, channel, false);
+      }
+
+      function stepChannel(delta) {
+        var list = filteredChannels.length > 0 ? filteredChannels : channels;
+        if (list.length === 0) return;
+
+        var idx = -1;
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].url === activeChannelUrl) {
+            idx = i;
+            break;
+          }
+        }
+        var nextIdx = idx === -1 ? 0 : (idx + delta + list.length) % list.length;
+        playChannel(list[nextIdx]);
+      }
+
+      function appendChannelBatch() {
+        var existingBtn = document.getElementById("loadMoreChannelsBtn");
+        if (existingBtn && existingBtn.parentNode) {
+          existingBtn.parentNode.removeChild(existingBtn);
+        }
+
+        var end = Math.min(renderedCount + BATCH_SIZE, filteredChannels.length);
+        var fragment = document.createDocumentFragment();
+
+        for (var i = renderedCount; i < end; i++) {
+          (function (ch, index) {
+            var card = document.createElement("div");
+            card.className = "channel-card" + (ch.url === activeChannelUrl ? " active" : "");
+            card.setAttribute("tabindex", "0");
+            card.setAttribute("data-index", index);
+            card.setAttribute("data-url", ch.url);
+
+            var img = document.createElement("img");
+            img.src = ch.logo;
+            img.alt = "";
+            img.onerror = function () { this.src = FALLBACK_LOGO; };
+
+            var infoDiv = document.createElement("div");
+            infoDiv.className = "channel-info";
+
+            var nameDiv = document.createElement("div");
+            nameDiv.className = "channel-name";
+            nameDiv.textContent = ch.num + ". " + ch.name;
+
+            var groupDiv = document.createElement("div");
+            groupDiv.className = "channel-group";
+            groupDiv.textContent = ch.group;
+
+            infoDiv.appendChild(nameDiv);
+            infoDiv.appendChild(groupDiv);
+
+            card.appendChild(img);
+            card.appendChild(infoDiv);
+
+            card.addEventListener("click", function () {
+              if (video.muted) video.muted = false;
+              playChannel(ch);
+            });
+            fragment.appendChild(card);
+          })(filteredChannels[i], i);
+        }
+
+        renderedCount = end;
+        channelListEl.appendChild(fragment);
+
+        if (renderedCount < filteredChannels.length) {
+          var moreBtn = document.createElement("button");
+          moreBtn.id = "loadMoreChannelsBtn";
+          moreBtn.className = "secondary load-more-btn";
+          moreBtn.textContent = "Load More (" + (filteredChannels.length - renderedCount) + " remaining)";
+          moreBtn.addEventListener("click", function () {
+            appendChannelBatch();
+          });
+          channelListEl.appendChild(moreBtn);
+        }
+      }
+
+      function renderChannels() {
+        filteredChannels = [];
+        var q = searchQuery.toLowerCase();
+        for (var k = 0; k < channels.length; k++) {
+          var chItem = channels[k];
+          var matchesCat = activeCategory === "All" || chItem.group === activeCategory;
+          var matchesSearch = chItem.name.toLowerCase().indexOf(q) !== -1;
+          if (matchesCat && matchesSearch) {
+            filteredChannels.push(chItem);
+          }
+        }
+
+        channelCount.textContent = filteredChannels.length + " channels";
+        channelListEl.innerHTML = "";
+        channelListEl.scrollTop = 0;
+        renderedCount = 0;
+
+        appendChannelBatch();
+      }
+
+      channelListEl.addEventListener("scroll", function () {
+        if (renderedCount >= filteredChannels.length) return;
+        if (channelListEl.scrollTop + channelListEl.clientHeight >= channelListEl.scrollHeight - 160) {
+          appendChannelBatch();
+        }
+      });
+
+      /* LG Magic Remote & Keyboard Navigation */
+      document.addEventListener("keydown", function (e) {
+        var key = e.keyCode || e.which;
+        var activeEl = document.activeElement;
+        var isTyping = activeEl && (activeEl.tagName === "INPUT");
+
+        if (video.muted) {
+          video.muted = false;
+        }
+
+        if (!isTyping && key >= 48 && key <= 57) {
+          var digit = String(key - 48);
+          zapDigits += digit;
+          setStatus("CH " + zapDigits + "...", "warn");
+
+          clearTimeout(zapTimer);
+          zapTimer = setTimeout(function () {
+            var targetNum = parseInt(zapDigits, 10);
+            zapDigits = "";
+            for (var i = 0; i < channels.length; i++) {
+              if (channels[i].num === targetNum) {
+                playChannel(channels[i]);
+                break;
+              }
+            }
+          }, 1100);
+          return;
+        }
+
+        if (key === 427 || key === 33) {
+          e.preventDefault();
+          stepChannel(-1);
+          return;
+        }
+        if (key === 428 || key === 34) {
+          e.preventDefault();
+          stepChannel(1);
+          return;
+        }
+
+        if (key === 461 || key === 27) {
+          if (hasClass(settingsDrawer, "open")) {
+            e.preventDefault();
+            removeClass(settingsDrawer, "open");
+            removeClass(settingsToggleBtn, "active");
+          }
+          return;
+        }
+
+        if (activeEl && hasClass(activeEl, "channel-card")) {
+          var idx = parseInt(activeEl.getAttribute("data-index"), 10);
+          var cards = channelListEl.querySelectorAll(".channel-card");
+
+          if (key === 13) {
+            e.preventDefault();
+            activeEl.click();
+          } else if (key === 39) {
+            e.preventDefault();
+            if (idx + 1 >= renderedCount && renderedCount < filteredChannels.length) {
+              appendChannelBatch();
+              cards = channelListEl.querySelectorAll(".channel-card");
+            }
+            if (cards[idx + 1]) cards[idx + 1].focus();
+          } else if (key === 37) {
+            e.preventDefault();
+            if (cards[idx - 1]) cards[idx - 1].focus();
+          } else if (key === 40) {
+            e.preventDefault();
+            if (idx + 2 >= renderedCount && renderedCount < filteredChannels.length) {
+              appendChannelBatch();
+              cards = channelListEl.querySelectorAll(".channel-card");
+            }
+            if (cards[idx + 2]) cards[idx + 2].focus();
+          } else if (key === 38) {
+            e.preventDefault();
+            if (idx - 2 >= 0 && cards[idx - 2]) {
+              cards[idx - 2].focus();
+            } else {
+              var activeTab = categoryTabs.querySelector(".tab.active") || categoryTabs.querySelector(".tab");
+              if (activeTab) activeTab.focus();
+            }
+          }
+          return;
+        }
+
+        if (activeEl && hasClass(activeEl, "tab")) {
+          var tabs = Array.prototype.slice.call(categoryTabs.querySelectorAll(".tab"));
+          var tIdx = tabs.indexOf(activeEl);
+          if (key === 39 && tabs[tIdx + 1]) {
+            e.preventDefault();
+            tabs[tIdx + 1].focus();
+          } else if (key === 37 && tabs[tIdx - 1]) {
+            e.preventDefault();
+            tabs[tIdx - 1].focus();
+          } else if (key === 40) {
+            e.preventDefault();
+            var firstCard = channelListEl.querySelector(".channel-card.active") || channelListEl.querySelector(".channel-card");
+            if (firstCard) firstCard.focus();
+          } else if (key === 13) {
+            e.preventDefault();
+            activeEl.click();
+          }
+        }
+      });
+
+      categoryTabs.addEventListener("click", function (e) {
+        if (!hasClass(e.target, "tab")) return;
+        var allTabs = categoryTabs.querySelectorAll(".tab");
+        for (var i = 0; i < allTabs.length; i++) removeClass(allTabs[i], "active");
+        addClass(e.target, "active");
+        activeCategory = e.target.getAttribute("data-category");
+        renderChannels();
+      });
+
+      searchInput.addEventListener("input", function (e) {
+        searchQuery = e.target.value;
+        renderChannels();
+      });
+
+      prevChBtn.addEventListener("click", function () {
+        if (video.muted) video.muted = false;
+        stepChannel(-1);
+      });
+
+      nextChBtn.addEventListener("click", function () {
+        if (video.muted) video.muted = false;
+        stepChannel(1);
+      });
+
+      loadUrlBtn.addEventListener("click", function () {
+        var url = m3uUrlInput.value.replace(/^\s+|\s+$/g, "");
+        if (url) {
+          try { localStorage.setItem(STORAGE_CUSTOM_M3U, url); } catch (e) {}
+          loadM3UPlaylist(url);
+          removeClass(settingsDrawer, "open");
+          removeClass(settingsToggleBtn, "active");
+        }
+      });
+
+      resetDefaultBtn.addEventListener("click", function () {
+        try { localStorage.removeItem(STORAGE_CUSTOM_M3U); } catch (e) {}
+        m3uUrlInput.value = "";
+        loadM3UPlaylist(DEFAULT_M3U_URL);
+        removeClass(settingsDrawer, "open");
+        removeClass(settingsToggleBtn, "active");
+      });
+
+      fileInput.addEventListener("change", function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var parsed = parseM3U(ev.target.result);
+          if (parsed.length > 0) {
+            channels = parsed;
+            activeCategory = "Bangladesh";
+            buildCategoryTabs();
+            renderChannels();
+            removeClass(settingsDrawer, "open");
+            removeClass(settingsToggleBtn, "active");
+            playChannel(filteredChannels[0] || channels[0]);
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      function initializeStartupPlayback() {
+        var savedUrl = null;
+        try { savedUrl = localStorage.getItem(STORAGE_LAST_URL); } catch (e) {}
+
+        var startChannel = null;
+        if (savedUrl) {
+          for (var i = 0; i < channels.length; i++) {
+            if (channels[i].url === savedUrl) {
+              startChannel = channels[i];
+              break;
+            }
+          }
+        }
+        if (!startChannel) {
+          startChannel = filteredChannels.length > 0 ? filteredChannels[0] : channels[0];
+        }
+        if (startChannel) {
+          playChannel(startChannel);
+        }
+      }
+
+      function loadBuiltinFallback() {
+        channels = [];
+        for (var idx = 0; idx < BUILTIN_CHANNELS.length; idx++) {
+          var c = BUILTIN_CHANNELS[idx];
+          channels.push({ num: idx + 1, name: c.name, group: c.group, logo: c.logo, url: c.url });
+        }
+        activeCategory = "Bangladesh";
+        buildCategoryTabs();
+        renderChannels();
+        initializeStartupPlayback();
+      }
+
+      function loadM3UPlaylist(url) {
+        setStatus("Loading Channels...", "warn");
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.timeout = 8000;
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status >= 200 && xhr.status < 300 && xhr.responseText) {
+              var parsed = parseM3U(xhr.responseText);
+              if (parsed.length > 0) {
+                channels = parsed;
+                activeCategory = "Bangladesh";
+                buildCategoryTabs();
+                renderChannels();
+                initializeStartupPlayback();
+                return;
+              }
+            }
+            loadBuiltinFallback();
+          }
+        };
+
+        xhr.onerror = function () {
+          loadBuiltinFallback();
+        };
+
+        xhr.ontimeout = function () {
+          loadBuiltinFallback();
+        };
+
+        try {
+          xhr.send();
+        } catch (err) {
+          loadBuiltinFallback();
+        }
+      }
+
+      var initialM3U = DEFAULT_M3U_URL;
+      try {
+        var savedM3U = localStorage.getItem(STORAGE_CUSTOM_M3U);
+        if (savedM3U) {
+          initialM3U = savedM3U;
+          m3uUrlInput.value = savedM3U;
+        }
+      } catch (e) {}
+
+      loadM3UPlaylist(initialM3U);
+    })();
+  </script>
+</body>
+</html>
